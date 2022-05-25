@@ -55,26 +55,34 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.__token = None
+
     def __str__(self):
         return self.username
 
     @property
     def token(self):
-        """
-        Возвращает user.token
-        """
-        return self._generate_jwt_token()
+        if self.__token:
+            return self.__token
+        self.__token = self._generate_jwt_token()
+        return self.__token
+
+    @token.setter
+    def token(self, value):
+        self.__token = value
 
     def _generate_jwt_token(self):
         """
         Генерирует веб-токен JSON, в котором хранится идентификатор этого
         пользователя, срок действия токена составляет 1 день от создания
         """
-        dt = datetime.now() + timedelta(days=1)
+        dt = datetime.now() + timedelta(minutes=1)
 
         token = jwt.encode({
             'id': self.pk,
-            'exp': dt.second
+            'timestamp': int(dt.timestamp())
         }, settings.SECRET_KEY, algorithm='HS256')
 
         return token
