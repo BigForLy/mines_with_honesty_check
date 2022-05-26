@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 from django.contrib.auth import authenticate
 from .models import User
 
@@ -32,24 +32,24 @@ class LoginSerializer(serializers.Serializer):
         password = data.get('password', None)
 
         if email is None:
-            raise serializers.ValidationError(
+            raise exceptions.NotAuthenticated(
                 'An email address is required to log in.'
             )
 
         if password is None:
-            raise serializers.ValidationError(
+            raise exceptions.NotAuthenticated(
                 'A password is required to log in.'
             )
 
         user = authenticate(username=email, password=password)
 
         if user is None:
-            raise serializers.ValidationError(
+            raise exceptions.AuthenticationFailed(
                 'A user with this email and password was not found.'
             )
 
         if not user.is_active:
-            raise serializers.ValidationError(
+            raise exceptions.AuthenticationFailed(
                 'This user has been deactivated.'
             )
 

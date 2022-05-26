@@ -53,3 +53,6 @@ class JWTAuthentication(authentication.BaseAuthentication):
         user.token = token
 
         return (user, token)
+
+    def authenticate_header(self, request):
+        return self.authentication_header_prefix

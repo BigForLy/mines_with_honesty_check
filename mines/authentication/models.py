@@ -78,7 +78,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         Генерирует веб-токен JSON, в котором хранится идентификатор этого
         пользователя, срок действия токена составляет 1 день от создания
         """
-        dt = datetime.now() + timedelta(minutes=1)
+        dt = datetime.now() + timedelta(hours=1)
 
         token = jwt.encode({
             'id': self.pk,
