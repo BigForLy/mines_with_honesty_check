@@ -5,8 +5,9 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer,
+    LoginSerializer, RegistrationSerializer, UserOutputSerializer, UserSerializer,
 )
+from drf_yasg.utils import swagger_auto_schema
 
 
 class RegistrationAPIView(APIView):
@@ -14,10 +15,9 @@ class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = RegistrationSerializer
 
+    @swagger_auto_schema(request_body=RegistrationSerializer, responses={201: UserOutputSerializer(many=True)})
     def post(self, request):
-        user = request.data.get('user', {})
-
-        serializer = self.serializer_class(data=user)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -25,19 +25,20 @@ class RegistrationAPIView(APIView):
 
 
 class LoginAPIView(APIView):
+
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
 
+    @swagger_auto_schema(request_body=LoginSerializer, responses={200: UserOutputSerializer(many=True)})
     def post(self, request):
-        user = request.data.get('user', {})
-
-        serializer = self.serializer_class(data=user)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
+
     permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
 

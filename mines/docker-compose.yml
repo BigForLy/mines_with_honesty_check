@@ -3,8 +3,8 @@ version: "3.9"
 services:
 
   db:
-    restart: always
     image: postgres
+    restart: always
     container_name: postgres_mines
     environment:
       - POSTGRES_USER=$POSTGRES_USER
@@ -14,6 +14,12 @@ services:
     ports:
       - "$POSTGRES_PORT:5432"
 
+  cache:
+    image: redis
+    restart: always
+    container_name: redis_mines
+    ports:
+      - "$REDIS_PORT:6379"
 
 volumes:
   postgres_data:
