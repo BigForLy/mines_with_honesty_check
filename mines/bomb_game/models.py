@@ -39,7 +39,6 @@ class Bomb(models.Model):
         blank=False
     )
 
-
-class Meta:
-    db_table = 'bomb'
-    verbose_name = 'Игра бомбочки'
+    class Meta:
+        db_table = 'bomb'
+        verbose_name = 'Игра бомбочки'

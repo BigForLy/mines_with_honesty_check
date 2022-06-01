@@ -10,7 +10,10 @@ class RedisClient:
         self.time_minute_delta = time_minute_delta
 
     def get(self):
-        return self._client.get(self.key)
+        result = self._client.get(self.key)
+        if isinstance(result, bytes):
+            result = result.decode("utf-8")
+        return result
 
     def create_value(self, value):
         if not isinstance(value, str):
