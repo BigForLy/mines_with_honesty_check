@@ -1,4 +1,5 @@
 from .test_setup import TestSetUp
+from datetime import datetime, timedelta
 from rest_framework import status
 import copy
 from freezegun import freeze_time
@@ -47,7 +48,8 @@ class TestLoginViews(TestSetUp):
 
     def test_user_login_incorrect_data(self):
         data = copy.deepcopy(self.user_data)
-        data['user']['password'] = self.user_data['user']['password'] + '1'
+        data['password'] += '1'
+
         response = self.client.post(
             self.signin_url,
             data,
@@ -85,9 +87,9 @@ class TestAccountUser(TestSetUp):
     def test_user_profile_update_correctly(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
-        new_email = self.user_data['user']['email'] + '1'
+        new_email = self.user_data['email'] + '1'
         data = copy.deepcopy(self.user_data)
-        data['user']['email'] = new_email
+        data['email'] = new_email
 
         response = self.client.put(
             self.user_url,
@@ -100,8 +102,9 @@ class TestAccountUser(TestSetUp):
     def test_user_profile_patch_correctly(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
-        new_email = self.user_data['user']['email'] + '1'
-        data = {"user": {"email": new_email}}
+        new_email = self.user_data['email'] + '1'
+        data = {"email": new_email}
+
         response = self.client.put(
             self.user_url,
             data,
@@ -123,7 +126,7 @@ class TestTokenLiveCycle(TestSetUp):
         token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
 
-    @freeze_time("2022-05-27")
+    @freeze_time(datetime.now() + timedelta(hours=2))
     def test_token_live_cycle_ended(self):
         response = self.client.get(
             self.user_url
