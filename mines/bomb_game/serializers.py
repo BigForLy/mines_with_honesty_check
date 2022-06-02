@@ -1,18 +1,32 @@
 from rest_framework import serializers
 from django.conf import settings
+from .models import Bomb
 
 
-class BombOutputSerializer(serializers.BaseSerializer):
-    def to_representation(self, instance) -> dict:
-        return {
-            "game_token": instance.pk,
-            "opened": instance.opened,
-            "price_difference": instance.price_difference,
-            "bomb_in": self.context.get('bomb_in', []),
-            "game_log": self.context.get('game_log'),
-            "game_started_at": instance.started_at,
-            "game_duration": settings.BOMB_GAME_TIME_IN_MINUTES
-        }
+class BombOutputSerializer(serializers.ModelSerializer):
+
+    game_token = serializers.UUIDField(source='pk')
+    bomb_in = serializers.SerializerMethodField()
+    bomb_count = serializers.SerializerMethodField()
+    game_duration = serializers.SerializerMethodField()
+    game_log = serializers.SerializerMethodField()
+
+    def get_bomb_in(self, obj):
+        return self.context.get('bomb_in', [])
+
+    def get_bomb_count(self, obj):
+        return self.context.get('bomb_count')
+
+    def get_game_duration(self, obj):
+        return settings.BOMB_GAME_TIME_IN_MINUTES
+
+    def get_game_log(self, obj):
+        return self.context.get('game_log')
+
+    class Meta:
+        model = Bomb
+        fields = ['game_token', 'opened', 'bomb_in', 'bomb_count', 'price_difference',
+                  'start_sum', 'started_at', 'game_duration', 'game_log']
 
 
 class BomdGameStartSerializer(serializers.Serializer):
@@ -38,7 +52,7 @@ class BomdGameStartSerializer(serializers.Serializer):
                 'Start sum incorrect value.'
             )
 
-        if self.context.balance < start_sum:
+        if not 0 < start_sum < self.context.balance:
             raise serializers.ValidationError(
                 'User balance encorrect.'
             )

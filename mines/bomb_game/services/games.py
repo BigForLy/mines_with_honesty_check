@@ -19,7 +19,7 @@ class AbstaractGame:
             key=user.id,
             time_minute_delta=game_time
         )
-        # self.money_manager = 
+        # self.money_manager =
         self.game_token = self._game_token()
 
     @abstractmethod
@@ -75,7 +75,10 @@ class BombGame(AbstaractGame):
         self.redis_client.create_value(value=instanse.pk)
         return BombOutputSerializer(
             instanse,
-            context={"game_log": "Game started."}
+            context={
+                "game_log": "Game started.",
+                "bomb_count": len(instanse.bomb_in)
+            }
         )
 
     def move(self, data):
@@ -99,7 +102,10 @@ class BombGame(AbstaractGame):
 
         return BombOutputSerializer(
             instanse,
-            context={"game_log": "Movement successful."}
+            context={
+                "game_log": "Movement successful.",
+                "bomb_count": len(instanse.bomb_in)
+            }
         )
 
     def end(self, instanse=None):
@@ -118,6 +124,7 @@ class BombGame(AbstaractGame):
             instanse,
             context={
                 "game_log": "Endgame successful.",
-                "bomb_in": instanse.bomb_in
+                "bomb_in": instanse.bomb_in,
+                "bomb_count": len(instanse.bomb_in)
             }
         )
