@@ -51,7 +51,7 @@ class TestLoginViews(TestSetUp):
             self.signin_url,
             data
         )
-        self.assertEquals(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class TestAccountUser(TestSetUp):

@@ -93,7 +93,7 @@ class BombGame(AbstaractGame):
         instanse.opened.append(move)
 
         if move in instanse.bomb_in:
-            self.end(instanse)
+            return self.end(instanse)
 
         instanse.price_difference = int(
             1.2 * (instanse.price_difference + instanse.start_sum)
