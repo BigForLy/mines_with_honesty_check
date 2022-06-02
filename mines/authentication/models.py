@@ -51,7 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     updated_at = models.DateTimeField(auto_now=True)
 
-    quantity = models.PositiveIntegerField(default=100)
+    balance = models.PositiveIntegerField(default=100)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -79,7 +79,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def _generate_jwt_token(self):
         """
         Генерирует веб-токен JSON, в котором хранится идентификатор этого
-        пользователя, срок действия токена составляет 1 день от создания
+        пользователя, срок действия токена составляет 1 час от создания
         """
         dt = datetime.now() + timedelta(hours=1)
 

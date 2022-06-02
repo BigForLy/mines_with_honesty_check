@@ -2,6 +2,7 @@ import jwt
 from datetime import datetime
 from rest_framework import authentication, exceptions
 from .models import User
+from django.conf import settings
 
 
 class JWTAuthentication(authentication.BaseAuthentication):
@@ -28,12 +29,11 @@ class JWTAuthentication(authentication.BaseAuthentication):
         if prefix.lower() != auth_header_prefix:
             return None
 
-        return self._authenticate_credentials(request, token)
+        return self._authenticate_credentials(token)
 
-    def _authenticate_credentials(self, request, token):
+    def _authenticate_credentials(self, token):
         try:
-            payload = jwt.decode(token.encode(
-                'utf-8'), options={"verify_signature": False})
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms="HS256")
         except Exception:
             raise exceptions.AuthenticationFailed('Authentication error.')
 

@@ -97,6 +97,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'authentication.backends.JWTAuthentication',
     ),
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
 
 CACHES = {
@@ -154,5 +155,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Bomb Game
 BOMB_GAME_TIME_IN_MINUTES = 5
+BOMB_GAME_COUNT_ELEMENT = range(0, 25)
 MAX_COUNT_BOMB = 24
 MIN_COUNT_BOMB = 1

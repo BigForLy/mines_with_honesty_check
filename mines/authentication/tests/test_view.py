@@ -16,8 +16,7 @@ class TestRegisterViews(TestSetUp):
     def test_user_can_register_correctly(self):
         response = self.client.post(
             self.signup_url,
-            self.user_data,
-            format="json"
+            self.user_data
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -28,8 +27,7 @@ class TestLoginViews(TestSetUp):
         super().setUp()
         self.client.post(
             self.signup_url,
-            self.user_data,
-            format="json"
+            self.user_data
         )
 
     def test_user_can_login_wthout_data(self):
@@ -41,8 +39,7 @@ class TestLoginViews(TestSetUp):
     def test_user_login_correctly(self):
         response = self.client.post(
             self.signin_url,
-            self.user_data,
-            format="json"
+            self.user_data
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -52,8 +49,7 @@ class TestLoginViews(TestSetUp):
 
         response = self.client.post(
             self.signin_url,
-            data,
-            format="json"
+            data
         )
         self.assertEquals(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -64,8 +60,7 @@ class TestAccountUser(TestSetUp):
         super().setUp()
         response = self.client.post(
             self.signup_url,
-            self.user_data,
-            format="json"
+            self.user_data
         )
         self.token = response.data['token']
 
@@ -93,8 +88,7 @@ class TestAccountUser(TestSetUp):
 
         response = self.client.put(
             self.user_url,
-            data,
-            format="json"
+            data
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['email'], new_email)
@@ -107,8 +101,7 @@ class TestAccountUser(TestSetUp):
 
         response = self.client.put(
             self.user_url,
-            data,
-            format="json"
+            data
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['email'], new_email)
@@ -120,8 +113,7 @@ class TestTokenLiveCycle(TestSetUp):
         super().setUp()
         response = self.client.post(
             self.signup_url,
-            self.user_data,
-            format="json"
+            self.user_data
         )
         token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
