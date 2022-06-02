@@ -1,6 +1,3 @@
-from django.urls import reverse
-from freezegun import freeze_time
-from datetime import datetime, timedelta
 from ..tests.tets_setup import TestSetUp, TestSetUpAlreadyCreatedModel
 from rest_framework import status
 
@@ -77,21 +74,3 @@ class TestBombStartGameAlreadyCreatedViews(TestSetUpAlreadyCreatedModel):
             self.bomb_game_data
         )
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
-
-    @freeze_time(datetime.now() + timedelta(hours=2))
-    def test_start_game_after_time(self):
-        response = self.client.post(
-            reverse('signup'),
-            {
-                "email": "template_email@pgadmin.org",
-                "username": "template_username",
-                "password": "template_password"
-            }
-        )
-        token = response.data['token']
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
-        response = self.client.post(
-            self.start_bomb_game_url,
-            self.bomb_game_data
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
