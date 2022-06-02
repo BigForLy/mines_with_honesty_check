@@ -19,19 +19,28 @@ class TestSetUp(APITestCase):
                 "email": "template_email@pgadmin.org",
                 "username": "template_username",
                 "password": "template_password"
-            },
-            format="json"
+            }
         )
         token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
         return super().setUp()
 
-    def __clear_redis_keys(self):
+    def _clear_redis_keys(self):
         redis_client = get_redis_connection()
         keys = redis_client.keys('*')
         for key in keys:
             redis_client.delete(key)
 
     def tearDown(self) -> None:
-        self.__clear_redis_keys()
+        self._clear_redis_keys()
         return super().tearDown()
+
+
+class TestSetUpAlreadyCreatedModel(TestSetUp):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self. created_game = self.client.post(
+            self.start_bomb_game_url,
+            self.bomb_game_data
+        )
