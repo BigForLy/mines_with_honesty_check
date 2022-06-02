@@ -9,6 +9,7 @@ class TestStartGameSetUp(APITestCase):
     def setUp(self) -> None:
         self.start_bomb_game_url = reverse('start_bomb_game')
         self.move_bomb_game_url = reverse('move_bomb_game')
+        self.end_bomb_game_url = reverse('end_bomb_game')
 
         self.bomb_game_start_data = {
             "bomb": 3,
@@ -42,7 +43,7 @@ class TestSetUpAlreadyCreatedModel(TestStartGameSetUp):
 
     def setUp(self) -> None:
         super().setUp()
-        self. created_game = self.client.post(
+        self.created_game = self.client.post(
             self.start_bomb_game_url,
             self.bomb_game_start_data
         )

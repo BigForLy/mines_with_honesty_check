@@ -138,3 +138,20 @@ class TestBombMoveGameViews(TestMoveGameSetUp):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data.get("bomb_in")),
                          self.bomb_game_start_data.get("bomb"))
+
+
+class TestBombMoveGameViews(TestSetUpAlreadyCreatedModel):
+
+    def test_end_game_correctly(self):
+        response = self.client.post(
+            self.end_bomb_game_url
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class TestBombMoveGameNotFoundViews(TestStartGameSetUp):
+    def test_end_game_game_not_found(self):
+        response = self.client.post(
+            self.end_bomb_game_url
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
