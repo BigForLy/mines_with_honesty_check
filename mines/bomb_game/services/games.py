@@ -3,6 +3,8 @@ from abc import abstractmethod
 from django.db import models
 from django.conf import settings
 from rest_framework import exceptions
+
+from ..services.money import MoneyManager
 from ..exceptions import Conflict
 from ..serializers import BombOutputSerializer
 from ..models import Bomb
@@ -19,7 +21,6 @@ class AbstaractGame:
             key=user.id,
             time_minute_delta=game_time
         )
-        # self.money_manager =
         self.game_token = self._game_token()
 
     @abstractmethod
@@ -31,7 +32,7 @@ class AbstaractGame:
         pass
 
     @abstractmethod
-    def end(self, instanse=None):
+    def end(self, instance=None):
         pass
 
     def _game_token(self) -> bool:
@@ -45,7 +46,7 @@ class AbstaractGame:
         if self.game_token:
             raise Conflict()
 
-    def _get_instanse(self):
+    def _get_instance(self):
         try:
             return self.model.objects.get(id=self.game_token)
         except self.model.DoesNotExist:
@@ -64,7 +65,7 @@ class BombGame(AbstaractGame):
     def start(self, data):
         self._check_not_game_started()
 
-        instanse = self.model.objects.create(
+        instance = self.model.objects.create(
             user=self.user,
             start_sum=data['start_sum'],
             bomb_in=random.sample(
@@ -72,59 +73,57 @@ class BombGame(AbstaractGame):
                 data["bomb"]
             )
         )
-        self.redis_client.create_value(value=instanse.pk)
+        self.redis_client.create_value(value=instance.pk)
         return BombOutputSerializer(
-            instanse,
+            instance,
             context={
                 "game_log": "Game started.",
-                "bomb_count": len(instanse.bomb_in)
+                "bomb_count": len(instance.bomb_in)
             }
         )
 
     def move(self, data):
         self._check_game_started()
 
-        instanse = self._get_instanse()
+        instance = self._get_instance()
 
         move = data.get('move')
-        if move in instanse.opened:
+        if move in instance.opened:
             raise Conflict("Move has already been made. Make another move.")
 
-        instanse.opened.append(move)
+        instance.opened.append(move)
 
-        if move in instanse.bomb_in:
-            return self.end(instanse)
+        if move in instance.bomb_in:
+            return self.end(instance)
 
-        instanse.price_difference = int(
-            1.2 * (instanse.price_difference + instanse.start_sum)
-        )
-        instanse.save()
+        manager = MoneyManager.create('bomb')
+        manager.win(instance)
+
+        instance.save()
 
         return BombOutputSerializer(
-            instanse,
+            instance,
             context={
                 "game_log": "Movement successful.",
-                "bomb_count": len(instanse.bomb_in)
+                "bomb_count": len(instance.bomb_in)
             }
         )
 
-    def end(self, instanse=None):
-        if not instanse:
+    def end(self, instance=None):
+        if not instance:
             self._check_game_started()
-            instanse = self._get_instanse()
+            instance = self._get_instance()
 
-        # если есть пересечение открытых полей и бомб, игра проиграна
-        if len(set(instanse.opened) & set(instanse.bomb_in)):
-            instanse.price_difference = -1 * instanse.start_sum
-            instanse.save()
+        manager = MoneyManager.create('bomb')
+        manager.end(self.user, instance)
 
         self.redis_client.delete_value()
 
         return BombOutputSerializer(
-            instanse,
+            instance,
             context={
                 "game_log": "Endgame successful.",
-                "bomb_in": instanse.bomb_in,
-                "bomb_count": len(instanse.bomb_in)
+                "bomb_in": instance.bomb_in,
+                "bomb_count": len(instance.bomb_in)
             }
         )
