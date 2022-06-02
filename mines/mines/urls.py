@@ -32,12 +32,12 @@ schema_view = get_schema_view(
 
 
 url_games = [
-    path('bomb/', include('bomb_game.urls')),
+    path('v1/bomb/', include('bomb_game.urls')),
 ]
 
 
 url_api = [
-    path('user/v1/', include('authentication.urls')),
+    path('v1/user/', include('authentication.urls')),
     path('game/', include(url_games)),
 ]
 

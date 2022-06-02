@@ -20,6 +20,9 @@ class RedisClient:
             value = str(value)
         self.__setex(value)
 
+    def delete_value(self):
+        self._client.delete(self.key)
+
     def __setex(self, value):
         self._client.setex(self.key,
                            timedelta(minutes=self.time_minute_delta),
