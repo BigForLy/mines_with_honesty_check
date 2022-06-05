@@ -8,3 +8,16 @@
 
 В игре можно просмотреть историю игр всех пользователей, можно отсотрировать и посмотреть только свои, страницы истории разбиты по 10/20 элементов, отдельный endpoint для всей истории.
 
+# Celery
+
+```
+celery -A mines worker --loglevel=info --pool=solo
+
+--pool=solo — специально для Windows
+```
+
+# Flower
+
+```
+celery -A mines flower --address=127.0.0.6 --port=5566
+```
