@@ -1,13 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from .services.games import BombGame
+from services.games import BombGame
 from .serializers import (BomdGameStartSerializer, BomdGameMoveSerializer)
 
 
 class BombStartView(APIView):
-    permission_classes = (IsAuthenticated,)
     serializer_class = BomdGameStartSerializer
 
     def post(self, request):
@@ -24,8 +22,7 @@ class BombStartView(APIView):
         return Response(data, status=status.HTTP_201_CREATED)
 
 
-class BombMoveiew(APIView):
-    permission_classes = (IsAuthenticated,)
+class BombMoveView(APIView):
     serializer_class = BomdGameMoveSerializer
 
     def post(self, request):
@@ -42,7 +39,7 @@ class BombMoveiew(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-class BombEndiew(APIView):
+class BombEndView(APIView):
 
     def post(self, request):
         data = BombGame(user=request.user)\

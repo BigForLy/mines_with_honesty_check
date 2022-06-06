@@ -97,6 +97,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'authentication.backends.JWTAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
 
@@ -158,3 +161,7 @@ BOMB_GAME_TIME_IN_MINUTES = 5
 BOMB_GAME_COUNT_ELEMENT = range(0, 25)
 MAX_COUNT_BOMB = 24
 MIN_COUNT_BOMB = 1
+
+CELERY_BROKER_URL = "redis://" + env('HOST') + ":" + env('REDIS_PORT') + "/0"
+CELERY_RESULT_BACKEND = "redis://" + \
+    env('HOST') + ":" + env('REDIS_PORT') + "/0"

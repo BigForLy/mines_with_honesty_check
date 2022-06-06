@@ -4,7 +4,7 @@ from datetime import timedelta
 
 class RedisClient:
 
-    def __init__(self, key, time_minute_delta) -> None:
+    def __init__(self, key, time_minute_delta=0) -> None:
         self._client = get_redis_connection("default")
         self.key = key
         self.time_minute_delta = time_minute_delta
@@ -18,13 +18,13 @@ class RedisClient:
     def create_value(self, value):
         if not isinstance(value, str):
             value = str(value)
-        self.__setex(value)
+        self.__set(value)
 
     def delete_value(self):
         self._client.delete(self.key)
 
-    def __setex(self, value):
-        self._client.setex(self.key,
-                           timedelta(minutes=self.time_minute_delta),
-                           value=value
-                           )
+    def __set(self, value):
+        self._client.set(
+            self.key,
+            value=value
+        )

@@ -15,7 +15,7 @@ class BombOutputSerializer(serializers.ModelSerializer):
         return self.context.get('bomb_in', [])
 
     def get_bomb_count(self, obj):
-        return self.context.get('bomb_count')
+        return len(obj.bomb_in)
 
     def get_game_duration(self, obj):
         return settings.BOMB_GAME_TIME_IN_MINUTES
