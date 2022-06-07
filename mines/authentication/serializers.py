@@ -70,7 +70,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'token',)
+        fields = ('email', 'username', 'password', 'token', 'balance',)
 
         read_only_fields = ('token',)
 
@@ -87,10 +87,3 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-
-
-class UserOutputSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ('email', 'username', 'token',)

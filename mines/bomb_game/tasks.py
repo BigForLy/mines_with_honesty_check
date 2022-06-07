@@ -19,7 +19,7 @@ def celery_end_game(key: str, game_instance_pk: str) -> bool:
         except Bomb.DoesNotExist:
             raise
 
-        instance.user.balance += instance.price_difference
+        instance.user.balance += instance.price_difference  # todo: переделать на мани менеджер
         instance.user.save()
         return True
     return False

@@ -43,45 +43,19 @@ from services.game_state import Context, StateEndGame, StateWinGame, State
 #         return instance.price_difference + instance.start_sum
 
 
-class MoneyManager:
-    """
-    strategy
-    """
+# class MoneyManager:
 
-    # @classmethod
-    # def create(cls, model: models.Model):
-    #     if model == Bomb:
-    #         strategy = MoneyBomb
-    #     else:
-    #         raise RuntimeError('Невозможно найти менеджер %s' % str(model))
+#     # @classmethod
+#     # def create(cls, model: models.Model):
+#     #     if model == Bomb:
+#     #         strategy = MoneyBomb
+#     #     else:
+#     #         raise RuntimeError('Невозможно найти менеджер %s' % str(model))
 
-    #     return cls(strategy)
+#     #     return cls(strategy)
 
-    def __init__(self) -> None:
-        # self.__strategy = strategy
-        self.__state = None
+#     def __init__(self, state: State):
+#         self.__state = Context(state)
 
-    # def __call__(self, instance: models.Model) -> Any:
-    #     self.__instance = instance
-
-    # def win(self) -> int:
-    #     return self.__strategy.win(self.__instance)
-
-    # def end(self) -> int:
-    #     return self.__strategy.end(self.__instance)
-
-    # def user(self):
-    #     return MoneyUser()
-    #     # self.__instance.user.balance += self.__state.user()
-    #     # self.__instance.user.save()
-
-    # def game(self):
-    #     pass
-        # self.__instance.price_difference += self.__state.game()
-        # self.__instance.save()
-    def calculation(self):
-        self.__state.calculation()  # проверка что state not none
-
-    def state_change(self, instance, cls: State):
-        self.__instance = instance
-        self.__state = Context(cls(self.__instance))
+#     def calculation(self):
+#         self.__state.money_calculation()  # проверка что state not none

@@ -7,8 +7,7 @@ from bomb_game.exceptions import Conflict
 from authentication.models import User
 from datetime import timedelta
 from bomb_game.tasks import celery_end_game
-from services.game_state import Context, State, StateLoseGame, StateStartGame, StateEndGame, StateWinGame
-from services.money import MoneyManager
+from services.game_state import StateLoseGame, StateStartGame, StateEndGame, StateWinGame, Context
 from bomb_game.serializers import BombOutputSerializer
 from bomb_game.models import Bomb
 from .redis import RedisClient
@@ -26,8 +25,8 @@ class AbstaractGame:
         )
         self.__game_token = self._game_token()
         self.__instance = None
-        self._money_manager = MoneyManager()
-        self.__state = None
+        self._money_manager = None
+        self._state: Context = Context()
 
     @abstractmethod
     def start(self, data):
@@ -73,15 +72,10 @@ class AbstaractGame:
         )
         self.__celery_create_worker()
         self.__redis_client.create_value(value=self.__instance.pk)
-        # self._money_manager.state_change(self.__instance, StateStartGame)
 
-        # self._money_manager.calculation()
         return self.__instance
 
-    def _state_change(self, cls: State):
-        self.__state = Context(cls(self.__instance))
-
-    def _end_game(self):
+    def _redis_delete(self):
         self.__redis_client.delete_value()
 
     def __celery_create_worker(self):
@@ -93,6 +87,12 @@ class AbstaractGame:
             retry=False,
             ignore_result=True
         )
+
+    def _state_to_application(self, cls):
+        self._state.to_application(self.__instance, cls())
+
+    def _state_transition_to(self, cls):
+        self._state.transition_to(cls())
 
 
 class BombGame(AbstaractGame):
@@ -112,7 +112,8 @@ class BombGame(AbstaractGame):
                 data["bomb"]
             )
         )
-        self.__state = StateStartGame
+        self._state_to_application(StateStartGame)
+        self._state.money_calculation()
 
         return BombOutputSerializer(
             instance,
@@ -123,22 +124,20 @@ class BombGame(AbstaractGame):
 
     def move(self, data):
         instance = self._get_instance()
-        self.__state = StateWinGame
-        # self._money_manager.state_change(instance, StateWinGame)
+        self._state_to_application(StateWinGame)
 
         move = data.get('move')
         if move in instance.opened:
             raise Conflict("Move has already been made. Make another move.")
 
         instance.opened.append(move)
+        instance.save()
 
         if move in instance.bomb_in:
-            self.__state = StateLoseGame
+            self._state_transition_to(StateLoseGame)
             return self.end()
 
-        # self._money_manager.calculation()
-
-        instance.save()
+        self._state.money_calculation()
 
         return BombOutputSerializer(
             instance,
@@ -149,15 +148,11 @@ class BombGame(AbstaractGame):
 
     def end(self):
         instance = self._get_instance()
-        self.__state = StateEndGame
-        # self._money_manager.state_change(instance, StateLoseGame)
+        self._state_to_application(StateEndGame)
 
-        # money_end = self._money_manager.end()
-        # self._money_manager.game()
-        # self._money_manager.user()
-        # self.manager.user.end()
+        self._redis_delete()
 
-        self._end_game()
+        self._state.money_calculation()
 
         return BombOutputSerializer(
             instance,

@@ -3,50 +3,44 @@ from abc import ABC, abstractmethod
 
 
 class Context:
-    """
-    Контекст определяет интерфейс, представляющий интерес для клиентов. Он также
-    хранит ссылку на экземпляр подкласса Состояния, который отображает текущее
-    состояние Контекста.
-    """
 
     _state = None
-    """
-    Ссылка на текущее состояние Контекста.
-    """
 
-    def __init__(self, state: State) -> None:
-        self.transition_to(state)
+    def __init__(self) -> None:
+        self._instance = None
+        self._states = self.__get_states()
 
-    def transition_to(self, state: State):
-        """
-        Контекст позволяет изменять объект Состояния во время выполнения.
-        """
+    def __get_states(self):
+        return [StateStartGame, StateWinGame, StateEndGame, StateLoseGame]
 
-        print(f"Context: Transition to {type(state).__name__}")
-        self._state = state
-        self._state.context = self
+    def to_application(self, instance, cls: State) -> bool:
+        self._instance = instance
+        return self.transition_to(cls)
 
-    """
-    Контекст делегирует часть своего поведения текущему объекту Состояния.
-    """
+    def transition_to(self, state: State) -> bool:
+        if self.__machine_state(state):
+            self._state.context = self
+            return True
+        return False
 
-    # def user(self):
-    #     return self._state.user()
+    def __machine_state(self, state):
+        if self._state is None:
+            self._state = state
+            return True
+        else:
+            index = self._states.index(type(self._state))
+            if self._states.index(type(state)) > index:
+                self._state = self._state = state
+                return True
+            else:
+                return False
 
-    # def game(self):
-    #     return self._state.game()
-    def calculation(self):
+    def money_calculation(self):
         self._state.user()
         self._state.game()
 
 
 class State(ABC):
-    """
-    Базовый класс Состояния объявляет методы, которые должны реализовать все
-    Конкретные Состояния, а также предоставляет обратную ссылку на объект
-    Контекст, связанный с Состоянием. Эта обратная ссылка может использоваться
-    Состояниями для передачи Контекста другому Состоянию.
-    """
 
     @property
     def context(self) -> Context:
@@ -58,65 +52,55 @@ class State(ABC):
 
     @abstractmethod
     def user(self) -> None:
-        raise NotImplementedError()
+        pass
 
     @abstractmethod
     def game(self) -> None:
-        raise NotImplementedError()
+        pass
 
 
 class StateStartGame(State):
 
-    def __init__(self, game_instance) -> None:
-        super().__init__()
-        self.__game_instance = game_instance
-
     def user(self) -> None:
-        self.__game_instance.user.balance += -1 * self.__game_instance.start_sum
-        self.__game_instance.user.save()
+        instance = self.context._instance
+        instance.user.balance += -1 * instance.start_sum
+        instance.user.save()
 
-    def game(self) -> None:
+    def game(self):
         pass
 
 
 class StateWinGame(State):
 
-    def __init__(self, game_instance) -> None:
-        super().__init__()
-        self.__game_instance = game_instance
-
-    def user(self) -> None:
+    def user(user):
         pass
 
     def game(self) -> None:
-        self.__game_instance.price_difference += int(
-            1.2 * self.__game_instance.price_difference +
-            0.2 * self.__game_instance.start_sum
+        instance = self.context._instance
+        instance.price_difference += int(
+            1.2 * instance.price_difference +
+            0.2 * instance.start_sum
         )
-        self.__game_instance.save()
+        instance.save()
 
 
 class StateLoseGame(State):
 
-    def __init__(self, game_instance) -> None:
-        super().__init__()
-        self.__game_instance = game_instance
-
-    def user(self) -> None:
-        return 0
+    def user(self):
+        pass
 
     def game(self) -> None:
-        return -1 * self.__game_instance.start_sum
+        instance = self.context._instance
+        instance.price_difference = -1 * instance.start_sum
+        instance.save()
 
 
 class StateEndGame(State):
 
-    def __init__(self, game_instance) -> None:
-        super().__init__()
-        self.__game_instance = game_instance
-
     def user(self) -> None:
-        return self.__game_instance.price_difference + self.__game_instance.start_sum
+        instance = self.context._instance
+        instance.user.balance += instance.price_difference + instance.start_sum
+        instance.user.save()
 
-    def game(self) -> None:
-        return None
+    def game(self):
+        pass
