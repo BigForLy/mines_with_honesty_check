@@ -61,3 +61,10 @@ class TestMoveGameSetUp(TestSetUpAlreadyCreatedModel):
         super().setUp()
         # восстанавливаем изначальную последовательность
         settings.BOMB_GAME_COUNT_ELEMENT = range_element
+
+
+class TestMoney(TestStartGameSetUp):
+
+    def setUp(self) -> None:
+        self.user_url = reverse('user')
+        return super().setUp()

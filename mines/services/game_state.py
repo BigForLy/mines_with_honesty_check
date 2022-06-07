@@ -30,7 +30,7 @@ class Context:
         else:
             index = self._states.index(type(self._state))
             if self._states.index(type(state)) > index:
-                self._state = self._state = state
+                self._state = state
                 return True
             else:
                 return False

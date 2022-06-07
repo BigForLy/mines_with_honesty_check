@@ -1,4 +1,4 @@
-from ..tests.tets_setup import TestStartGameSetUp, TestSetUpAlreadyCreatedModel, TestMoveGameSetUp
+from ..tests.tets_setup import TestStartGameSetUp, TestSetUpAlreadyCreatedModel, TestMoveGameSetUp, TestMoney
 from rest_framework import status
 
 
@@ -155,3 +155,24 @@ class TestBombMoveGameNotFoundViews(TestStartGameSetUp):
             self.end_bomb_game_url
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class TestBombMoneyStartGame(TestMoney):
+
+    def test_correctly_decrease_user_from_start_game(self):
+        # записываем сумму до старта игры
+        response = self.client.get(
+            self.user_url
+        )
+        correctly_money = response.data['balance']
+        # создаем игру
+        self.client.post(
+            self.start_bomb_game_url,
+            self.bomb_game_start_data
+        )
+        # проверяем баланс
+        response = self.client.get(
+            self.user_url
+        )
+        self.assertEqual(response.data['balance'],
+                         correctly_money - self.bomb_game_start_data["start_sum"])
