@@ -89,7 +89,7 @@ DATABASES = {
         'USER': env('POSTGRES_USER'),
         'PASSWORD': env('POSTGRES_PASSWORD'),
         'HOST': env('HOST'),
-        'PORT': env('POSTGRES_PORT')
+        'PORT': 5432
     }
 }
 
@@ -103,10 +103,13 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
 
+CELERY_BROKER_URL = "redis://" + env('REDIS_HOST') + ":6379"
+CELERY_RESULT_BACKEND = "redis://" + env('REDIS_HOST') + ":6379"
+
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/',
+        'LOCATION': CELERY_BROKER_URL,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -162,5 +165,5 @@ BOMB_GAME_COUNT_ELEMENT = range(0, 25)
 MAX_COUNT_BOMB = 24
 MIN_COUNT_BOMB = 1
 
-CELERY_BROKER_URL = env('CELERY_BROKER_URL')
-CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
+# CELERY_BROKER_URL = env('CELERY_BROKER_URL')
+# CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
