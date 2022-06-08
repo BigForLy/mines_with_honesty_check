@@ -78,8 +78,7 @@ class StateWinGame(State):
     def game(self) -> None:
         instance = self.context._instance
         instance.price_difference += int(
-            1.2 * instance.price_difference +
-            0.2 * instance.start_sum
+            0.2 * (instance.price_difference + instance.start_sum)
         )
         instance.save()
 
