@@ -10,6 +10,7 @@ class BombOutputSerializer(serializers.ModelSerializer):
     bomb_count = serializers.SerializerMethodField()
     game_duration = serializers.SerializerMethodField()
     game_log = serializers.SerializerMethodField()
+    hash_bomb_text = serializers.SerializerMethodField()
 
     def get_bomb_in(self, obj):
         return self.context.get('bomb_in', [])
@@ -23,10 +24,13 @@ class BombOutputSerializer(serializers.ModelSerializer):
     def get_game_log(self, obj):
         return self.context.get('game_log')
 
+    def get_hash_bomb_text(self, obj):
+        return self.context.get('hash_bomb_text')
+
     class Meta:
         model = Bomb
         fields = ['game_token', 'opened', 'bomb_in', 'bomb_count', 'price_difference',
-                  'start_sum', 'started_at', 'game_duration', 'game_log']
+                  'start_sum', 'started_at', 'game_duration', 'hash_bomb_text', 'hash_bomb_in', 'game_log']
 
 
 class BomdGameStartSerializer(serializers.Serializer):

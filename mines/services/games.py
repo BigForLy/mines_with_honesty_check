@@ -7,6 +7,7 @@ from bomb_game.exceptions import Conflict
 from authentication.models import User
 from datetime import timedelta
 from bomb_game.tasks import celery_end_game
+from services.decode import SHA256Decode
 from services.game_state import StateLoseGame, StateStartGame, StateEndGame, StateWinGame, Context
 from bomb_game.serializers import BombOutputSerializer
 from bomb_game.models import Bomb
@@ -68,7 +69,8 @@ class AbstaractGame:
         self.__instance = self.model.objects.create(
             user=self.user,
             start_sum=start_sum,
-            bomb_in=bomb_in
+            bomb_in=bomb_in,
+            hash_bomb_in=SHA256Decode.decode(str(bomb_in))
         )
         self.__celery_create_worker()
         self.__redis_client.create_value(value=self.__instance.pk)
@@ -158,6 +160,7 @@ class BombGame(AbstaractGame):
             instance,
             context={
                 "game_log": "Endgame successful.",
-                "bomb_in": instance.bomb_in
+                "bomb_in": instance.bomb_in,
+                "hash_bomb_text": str(instance.bomb_in)
             }
         )

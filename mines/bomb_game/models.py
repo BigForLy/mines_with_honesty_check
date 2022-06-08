@@ -39,6 +39,10 @@ class Bomb(models.Model):
         blank=False
     )
 
+    hash_bomb_in = models.CharField(
+        max_length=256
+    )
+
     class Meta:
         db_table = 'bomb'
         verbose_name = 'Игра бомбочки'
