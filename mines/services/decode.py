@@ -12,8 +12,7 @@ class AbstractDecode(ABC):
 class SHA256Decode(AbstractDecode):
 
     @staticmethod
-    def decode(value: str):
-        message = hashlib \
+    def decode(value: str) -> str:
+        return hashlib \
             .sha256(value.encode('utf-8')) \
             .hexdigest()
-        return message

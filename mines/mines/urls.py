@@ -32,7 +32,8 @@ schema_view = get_schema_view(
 
 
 url_games = [
-    path('v1/bomb/', include('bomb_game.urls')),
+    path('v1/bomb/', include(('bomb_game.urls', 'bomb_game'), namespace='v1')),
+    path('v2/bomb/', include(('bomb_game.urls', 'bomb_game'), namespace='v2')),
 ]
 
 

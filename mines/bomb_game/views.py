@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from .versions import VerisionStrategy
 from services.games import BombGame
 from .serializers import (BomdGameStartSerializer, BomdGameMoveSerializer)
 
@@ -15,7 +16,8 @@ class BombStartView(APIView):
         )
         serializer.is_valid(raise_exception=True)
 
-        data = BombGame(user=request.user)\
+        data = BombGame(user=request.user,
+                        version_cls=VerisionStrategy.create(request.version))\
             .start(serializer.data)\
             .data
 
@@ -32,7 +34,8 @@ class BombMoveView(APIView):
         )
         serializer.is_valid(raise_exception=True)
 
-        data = BombGame(user=request.user)\
+        data = BombGame(user=request.user,
+                        version_cls=VerisionStrategy.create(request.version))\
             .move(serializer.data)\
             .data
 
@@ -42,7 +45,8 @@ class BombMoveView(APIView):
 class BombEndView(APIView):
 
     def post(self, request):
-        data = BombGame(user=request.user)\
+        data = BombGame(user=request.user,
+                        version_cls=VerisionStrategy.create(request.version))\
             .end()\
             .data
 

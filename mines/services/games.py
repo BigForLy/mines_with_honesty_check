@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 from django.db import models
 from django.conf import settings
@@ -7,7 +7,9 @@ from bomb_game.exceptions import Conflict
 from authentication.models import User
 from datetime import timedelta
 from bomb_game.tasks import celery_end_game
-from services.decode import SHA256Decode
+from bomb_game.versions import AbstractVersion
+from services.decode import AbstractDecode
+# from services.decode import SHA256Decode
 from services.game_state import StateLoseGame, StateStartGame, StateEndGame, StateWinGame, Context
 from bomb_game.serializers import BombOutputSerializer
 from bomb_game.models import Bomb
@@ -15,9 +17,9 @@ from .redis import RedisClient
 import random
 
 
-class AbstaractGame:
+class AbstaractGame(ABC):
 
-    def __init__(self, model, user, game_time) -> None:
+    def __init__(self, model, user, game_time, version_cls) -> None:
         self.model: models.Model = model
         self.user: User = user
         self.__redis_client = RedisClient(
@@ -26,8 +28,10 @@ class AbstaractGame:
         )
         self.__game_token = self._game_token()
         self.__instance = None
-        self._money_manager = None
+        # self._money_manager = None
         self._state: Context = Context()
+        self._version_cls: AbstractVersion = version_cls
+        self._decoder: AbstractDecode = version_cls.decoder()
 
     @abstractmethod
     def start(self, data):
@@ -70,7 +74,7 @@ class AbstaractGame:
             user=self.user,
             start_sum=start_sum,
             bomb_in=bomb_in,
-            hash_bomb_in=SHA256Decode.decode(str(bomb_in))
+            hash_bomb_in=self._decoder.decode(str(bomb_in))
         )
         self.__celery_create_worker()
         self.__redis_client.create_value(value=self.__instance.pk)
@@ -99,11 +103,12 @@ class AbstaractGame:
 
 class BombGame(AbstaractGame):
 
-    def __init__(self, user) -> None:
+    def __init__(self, user, version_cls) -> None:
         super().__init__(
             model=Bomb,
             user=user,
-            game_time=settings.BOMB_GAME_TIME_IN_MINUTES
+            game_time=settings.BOMB_GAME_TIME_IN_MINUTES,
+            version_cls=version_cls
         )
 
     def start(self, data):
