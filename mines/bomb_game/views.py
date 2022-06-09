@@ -17,7 +17,7 @@ class BombStartView(APIView):
         serializer.is_valid(raise_exception=True)
 
         data = BombGame(user=request.user,
-                        version_cls=VerisionStrategy.create(request.version))\
+                        strategy=VerisionStrategy.create(request.version))\
             .start(serializer.data)\
             .data
 
@@ -35,7 +35,7 @@ class BombMoveView(APIView):
         serializer.is_valid(raise_exception=True)
 
         data = BombGame(user=request.user,
-                        version_cls=VerisionStrategy.create(request.version))\
+                        strategy=VerisionStrategy.create(request.version))\
             .move(serializer.data)\
             .data
 
@@ -46,7 +46,7 @@ class BombEndView(APIView):
 
     def post(self, request):
         data = BombGame(user=request.user,
-                        version_cls=VerisionStrategy.create(request.version))\
+                        strategy=VerisionStrategy.create(request.version))\
             .end()\
             .data
 

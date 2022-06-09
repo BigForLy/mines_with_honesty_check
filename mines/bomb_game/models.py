@@ -39,9 +39,7 @@ class Bomb(models.Model):
         blank=False
     )
 
-    hash_bomb_in = models.CharField(
-        max_length=256
-    )
+    hash_bomb_in = models.JSONField()
 
     class Meta:
         db_table = 'bomb'

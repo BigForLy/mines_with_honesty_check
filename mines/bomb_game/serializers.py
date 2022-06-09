@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.conf import settings
 from .models import Bomb
+import copy
 
 
 class BombOutputSerializer(serializers.ModelSerializer):
@@ -10,7 +11,7 @@ class BombOutputSerializer(serializers.ModelSerializer):
     bomb_count = serializers.SerializerMethodField()
     game_duration = serializers.SerializerMethodField()
     game_log = serializers.SerializerMethodField()
-    hash_bomb_text = serializers.SerializerMethodField()
+    hash_bomb_in = serializers.SerializerMethodField()
 
     def get_bomb_in(self, obj):
         return self.context.get('bomb_in', [])
@@ -24,13 +25,19 @@ class BombOutputSerializer(serializers.ModelSerializer):
     def get_game_log(self, obj):
         return self.context.get('game_log')
 
-    def get_hash_bomb_text(self, obj):
-        return self.context.get('hash_bomb_text')
+    def get_hash_bomb_in(self, obj):
+        data: dict = copy.deepcopy(obj.hash_bomb_in)
+        # если приходит hash_bomb_text значит игра закончена, иначе удаляем упоминание secret
+        if self.context.get('hash_bomb_text'):
+            data.update({"text": self.context.get('hash_bomb_text')})
+        else:
+            data.pop('secret')
+        return data
 
     class Meta:
         model = Bomb
         fields = ['game_token', 'opened', 'bomb_in', 'bomb_count', 'price_difference',
-                  'start_sum', 'started_at', 'game_duration', 'hash_bomb_text', 'hash_bomb_in', 'game_log']
+                  'start_sum', 'started_at', 'game_duration', 'hash_bomb_in', 'game_log']
 
 
 class BomdGameStartSerializer(serializers.Serializer):

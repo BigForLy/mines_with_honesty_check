@@ -7,9 +7,8 @@ from bomb_game.exceptions import Conflict
 from authentication.models import User
 from datetime import timedelta
 from bomb_game.tasks import celery_end_game
-from bomb_game.versions import AbstractVersion
+from bomb_game.versions import AbstractVersion, VerisionStrategy
 from services.decode import AbstractDecode
-# from services.decode import SHA256Decode
 from services.game_state import StateLoseGame, StateStartGame, StateEndGame, StateWinGame, Context
 from bomb_game.serializers import BombOutputSerializer
 from bomb_game.models import Bomb
@@ -19,7 +18,7 @@ import random
 
 class AbstaractGame(ABC):
 
-    def __init__(self, model, user, game_time, version_cls) -> None:
+    def __init__(self, model, user, game_time, strategy: VerisionStrategy) -> None:
         self.model: models.Model = model
         self.user: User = user
         self.__redis_client = RedisClient(
@@ -28,10 +27,8 @@ class AbstaractGame(ABC):
         )
         self.__game_token = self._game_token()
         self.__instance = None
-        # self._money_manager = None
         self._state: Context = Context()
-        self._version_cls: AbstractVersion = version_cls
-        self._decoder: AbstractDecode = version_cls.decoder()
+        self._version_strategy: VerisionStrategy = strategy
 
     @abstractmethod
     def start(self, data):
@@ -74,7 +71,7 @@ class AbstaractGame(ABC):
             user=self.user,
             start_sum=start_sum,
             bomb_in=bomb_in,
-            hash_bomb_in=self._decoder.decode(str(bomb_in))
+            hash_bomb_in=self._version_strategy.encrypt(bomb_in)
         )
         self.__celery_create_worker()
         self.__redis_client.create_value(value=self.__instance.pk)
@@ -103,12 +100,12 @@ class AbstaractGame(ABC):
 
 class BombGame(AbstaractGame):
 
-    def __init__(self, user, version_cls) -> None:
+    def __init__(self, user, strategy: VerisionStrategy) -> None:
         super().__init__(
             model=Bomb,
             user=user,
             game_time=settings.BOMB_GAME_TIME_IN_MINUTES,
-            version_cls=version_cls
+            strategy=strategy
         )
 
     def start(self, data):
