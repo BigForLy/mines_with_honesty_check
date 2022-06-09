@@ -7,8 +7,7 @@ from bomb_game.exceptions import Conflict
 from authentication.models import User
 from datetime import timedelta
 from bomb_game.tasks import celery_end_game
-from bomb_game.versions import AbstractVersion, VerisionStrategy
-from services.decode import AbstractDecode
+from bomb_game.versions import VerisionStrategy
 from services.game_state import StateLoseGame, StateStartGame, StateEndGame, StateWinGame, Context
 from bomb_game.serializers import BombOutputSerializer
 from bomb_game.models import Bomb
