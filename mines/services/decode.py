@@ -13,7 +13,7 @@ class AbstractDecode(ABC):
 
 class SHA256Decoder(AbstractDecode):
 
-    def encrypt(self, value: str) -> str:
+    def encrypt(self, value: str) -> dict:
         return {"type": "sha-256",
                 "hash": hashlib.sha256(value.encode('utf-8')).hexdigest(),
                 "secret": ""}
@@ -21,7 +21,7 @@ class SHA256Decoder(AbstractDecode):
 
 class AESCipher(object):
 
-    def encrypt(self, value: str):
+    def encrypt(self, value: str) -> dict:
         key = 'abcdefg123456789'
         key = key.encode()
         cypto_obj = AES.new(key, AES.MODE_ECB)
