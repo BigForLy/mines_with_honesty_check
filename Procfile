@@ -1,2 +1,2 @@
 release: python manage.py migrate
-web: gunicorn rest_spotify.wsgi --log-file -
+web: gunicorn mines.wsgi --log-file -
