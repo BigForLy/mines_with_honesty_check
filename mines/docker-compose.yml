@@ -13,6 +13,7 @@ services:
     environment:
       - HOST=db
       - REDIS_HOST=redis
+      - POSTGRES_PORT=5432
     ports:
       - 1337:8000
     depends_on:
