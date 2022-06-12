@@ -10,6 +10,8 @@ services:
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/usr/src/app/
+    env_file:
+      - ./.env
     environment:
       - HOST=db
       - REDIS_HOST=redis
@@ -26,6 +28,8 @@ services:
     container_name: postgres
     volumes:
       - db_volume:/var/lib/postgresql/data
+    env_file:
+      - ./.env
     environment:
       - REDIS_HOST=redis
     ports:
@@ -35,10 +39,12 @@ services:
     image: redis
     restart: always
     container_name: redis
+    env_file:
+      - ./.env
     volumes:
       - redis_volume:/var/lib/redis/data
     ports:
-      - "6379:6379"
+      - 6379:6379
 
   celery:
     build: .
