@@ -11,27 +11,23 @@
 Можно проверить игру на честность, при старте игры будет указан алгоритм, а при завершении игры будет доступен текст и секретный ключ.
 
 Реализованные алгоритмы:
+      		<pre>`VERSION                     ALGORITHM` <br/>
+          ` v1                         SHA-256` <br/>
+          ` v2                         AES`</pre>
 
-v1 - SHA-256
-v2 - AES
-
-# Docker compose
-
+## Getting Started
+### Build Rest-API
 Для запуска всей инфраструктуры необходимо запустить docker-compose.yml
 ```
 docker-compose up
 ```
-
-# Celery
-
+Для локального запуска
 ```
+celery:
 celery -A mines worker --loglevel=info --pool=solo
 
 --pool=solo — специально для Windows
-```
 
-# Flower
-
-```
+flower:
 celery -A mines flower --address=127.0.0.6 --port=5566
 ```
