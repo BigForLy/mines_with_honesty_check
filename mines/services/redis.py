@@ -4,10 +4,9 @@ from datetime import timedelta
 
 class RedisClient:
 
-    def __init__(self, key, time_minute_delta=0) -> None:
+    def __init__(self, key) -> None:
         self._client = get_redis_connection("default")
         self.key = key
-        self.time_minute_delta = time_minute_delta
 
     def get(self):
         result = self._client.get(self.key)

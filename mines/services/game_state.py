@@ -63,7 +63,7 @@ class StateStartGame(State):
 
     def user(self) -> None:
         instance = self.context._instance
-        instance.user.balance += -1 * instance.start_sum
+        instance.user.balance -= instance.start_sum
         instance.user.save()
 
     def game(self):
