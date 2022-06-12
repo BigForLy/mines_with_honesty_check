@@ -4,29 +4,29 @@ from base64 import b64encode
 from Crypto.Cipher import AES
 
 
-class AbstractDecode(ABC):
+class AbstractEncrypt(ABC):
 
     @abstractmethod
     def encrypt(self, value: str):
         pass
 
 
-class SHA256Decoder(AbstractDecode):
+class SHA256Encrypt(AbstractEncrypt):
 
     def encrypt(self, value: str) -> dict:
-        return {"type": "sha-256",
+        return {"algorithm": "sha-256",
                 "hash": hashlib.sha256(value.encode('utf-8')).hexdigest(),
                 "secret": ""}
 
 
-class AESCipher(object):
+class AESEncrypt(object):
 
     def encrypt(self, value: str) -> dict:
         key = 'abcdefg123456789'
         key = key.encode()
         cypto_obj = AES.new(key, AES.MODE_ECB)
         encrypted_data = cypto_obj.encrypt(self.__pkcs5_pad(value))
-        return {"type": "AES",
+        return {"algorithm": "AES",
                 "hash": b64encode(encrypted_data).decode(),
                 "secret": key.decode()}
 

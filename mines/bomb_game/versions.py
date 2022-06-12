@@ -1,27 +1,27 @@
 from abc import ABC, abstractmethod
 
-from services.decode import (SHA256Decoder, AESCipher, AbstractDecode)
+from services.decode import (SHA256Encrypt, AESEncrypt, AbstractEncrypt)
 
 
 class AbstractVersion(ABC):
 
     @abstractmethod
-    def decoder(self) -> AbstractDecode:
+    def decoder(self) -> AbstractEncrypt:
         pass
 
 
 class V1Version(AbstractVersion):
 
     @property
-    def decoder(self) -> AbstractDecode:
-        return SHA256Decoder()
+    def decoder(self) -> AbstractEncrypt:
+        return SHA256Encrypt()
 
 
 class V2Version(AbstractVersion):
 
     @property
-    def decoder(self) -> AbstractDecode:
-        return AESCipher()
+    def decoder(self) -> AbstractEncrypt:
+        return AESEncrypt()
 
 
 class VerisionStrategy:
