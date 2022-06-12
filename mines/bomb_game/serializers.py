@@ -3,7 +3,6 @@ from django.conf import settings
 from .models import Bomb
 import copy
 
-
 class BombOutputSerializer(serializers.ModelSerializer):
 
     game_token = serializers.UUIDField(source='pk')
@@ -13,19 +12,19 @@ class BombOutputSerializer(serializers.ModelSerializer):
     game_log = serializers.SerializerMethodField()
     hash_bomb_in = serializers.SerializerMethodField()
 
-    def get_bomb_in(self, obj):
+    def get_bomb_in(self, obj) -> list[int]:
         return self.context.get('bomb_in', [])
 
-    def get_bomb_count(self, obj):
+    def get_bomb_count(self, obj) -> int:
         return len(obj.bomb_in)
 
-    def get_game_duration(self, obj):
+    def get_game_duration(self, obj) -> int:
         return settings.BOMB_GAME_TIME_IN_MINUTES
 
-    def get_game_log(self, obj):
+    def get_game_log(self, obj) -> str:
         return self.context.get('game_log')
 
-    def get_hash_bomb_in(self, obj):
+    def get_hash_bomb_in(self, obj) -> dict:  # todo: created hash bomb serializer
         data: dict = copy.deepcopy(obj.hash_bomb_in)
         # если приходит hash_bomb_text значит игра закончена, иначе удаляем упоминание secret
         if self.context.get('hash_bomb_text'):

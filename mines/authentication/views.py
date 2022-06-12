@@ -1,21 +1,18 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer
 )
-from drf_yasg.utils import swagger_auto_schema
 
 
-class RegistrationAPIView(APIView):
+class RegistrationAPIView(GenericAPIView):
 
     permission_classes = (AllowAny,)
     serializer_class = RegistrationSerializer
 
-    @swagger_auto_schema(request_body=RegistrationSerializer, responses={201: UserSerializer(many=True)})
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -24,12 +21,11 @@ class RegistrationAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class LoginAPIView(APIView):
+class LoginAPIView(GenericAPIView):
 
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
 
-    @swagger_auto_schema(request_body=LoginSerializer, responses={200: UserSerializer(many=True)})
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

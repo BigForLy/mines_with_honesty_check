@@ -38,8 +38,8 @@ url_games = [
 
 
 url_api = [
-    path('v1/user/', include('authentication.urls')),
-    path('game/', include(url_games)),
+    path('v1/user/', include('authentication.urls'), name='user'),
+    path('game/', include(url_games), name='game'),
 ]
 
 

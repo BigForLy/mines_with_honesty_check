@@ -24,18 +24,19 @@ class Bomb(models.Model):
 
     start_sum = models.PositiveIntegerField()
 
-    price_difference = models.IntegerField(
+    price_difference = models.PositiveIntegerField(
         default=0
     )
 
     opened = ArrayField(
-        models.IntegerField(),
+        models.PositiveIntegerField(),
         default=list,
         blank=False
     )
 
     bomb_in = ArrayField(
-        models.IntegerField(),
+        models.PositiveIntegerField(),
+        default=list,
         blank=False
     )
 
