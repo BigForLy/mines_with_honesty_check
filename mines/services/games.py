@@ -97,7 +97,7 @@ class AbstaractGame(ABC):
 
 class BombGame(AbstaractGame):
 
-    def __init__(self, user, strategy: VerisionStrategy) -> None:
+    def __init__(self, user, strategy: VerisionStrategy = None) -> None:
         super().__init__(
             model=Bomb,
             user=user,

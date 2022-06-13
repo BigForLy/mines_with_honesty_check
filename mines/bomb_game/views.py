@@ -1,11 +1,13 @@
 from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.views import APIView
 from rest_framework import status
+
+from bomb_game.models import Bomb
 from .versions import VerisionStrategy
 from services.games import BombGame
 from .serializers import (BomdGameStartSerializer,
-                          BomdGameMoveSerializer, BombOutputSerializer)
+                          BomdGameMoveSerializer, BombOutputSerializer, BombHistorySerializer)
 from drf_yasg.utils import swagger_auto_schema
 
 
@@ -51,9 +53,14 @@ class BombEndView(APIView):
 
     @swagger_auto_schema(responses={200: BombOutputSerializer()})
     def post(self, request):
-        data = BombGame(user=request.user,
-                        strategy=VerisionStrategy.create(request.version))\
+        data = BombGame(user=request.user)\
             .end()\
             .data
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+class BombHistoryView(ListAPIView):
+
+    serializer_class = BombHistorySerializer
+    queryset = Bomb.objects.select_related('user').all()

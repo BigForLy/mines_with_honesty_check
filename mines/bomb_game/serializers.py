@@ -83,3 +83,11 @@ class BomdGameMoveSerializer(serializers.Serializer):
             )
 
         return super().validate(data)
+
+
+class BombHistorySerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+
+    class Meta:
+        model = Bomb
+        fields = ['username', 'price_difference']
