@@ -1,5 +1,8 @@
 from rest_framework import serializers, exceptions
 from django.contrib.auth import authenticate
+
+from bomb_game.models import Bomb
+from bomb_game.serializers import BombHistorySerializer
 from .models import User
 
 
@@ -68,11 +71,23 @@ class UserSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
+    game_history = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'token', 'balance',)
+        fields = ('email', 'username', 'password',
+                  'token', 'balance', 'game_history',)
 
         read_only_fields = ('token',)
+
+    def get_game_history(self, obj):
+        queryset = Bomb.objects\
+            .select_related('user')\
+            .filter(user=obj)\
+            .order_by('-started_at')\
+            .all()[:10]
+        serializer = BombHistorySerializer(queryset, many=True)
+        return serializer.data
 
     def update(self, instance, validated_data):
         """ Выполняет обновление User. """
